@@ -47,6 +47,8 @@ describe("fetch crypto test", () => {
       price1mthChange: -0.13335208023857753,
       volume: 988705452.84,
       marketCap: 4066775915.02,
+      image:
+        "https://assets.coingecko.com/coins/images/12645/standard/AAVE.png?1696512452",
     };
     const res = await request(application).get("/api/v1/currencies/AAVE/stats");
     expect(res.statusCode).toEqual(200);
