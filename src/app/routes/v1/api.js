@@ -6,5 +6,6 @@ const saasMiddleware = require("../../middleware/SaasMiddleware");
 router.use(saasMiddleware.saas);
 router.get("/currencies/all", crypto.findCurrencies);
 router.get("/currencies/:symbol/stats", crypto.fetchStatsBySymbol);
+router.get("/currencies/stats", crypto.fetchAllStats);
 
 module.exports = router;
