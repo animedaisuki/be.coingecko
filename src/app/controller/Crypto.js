@@ -1,7 +1,6 @@
 const status = require("http-status");
-const config = require("../config/app");
 const CryptoCurrencies = require("../model/cryptoCurrencies");
-const CryptoInfo = require("../model/cryptoInfo");
+const { fetchCurrencyStats } = require("../helper/fetchCurrencyStats");
 
 exports.findCurrencies = async (req, res) => {
   try {
@@ -18,67 +17,34 @@ exports.findCurrencies = async (req, res) => {
 exports.fetchStatsBySymbol = async (req, res) => {
   try {
     const { symbol } = req.params;
-
     const CryptoCurrencyModel = await CryptoCurrencies.getModel(
       req.dbConnetion
     );
-
-    const currentEntry = await CryptoCurrencyModel.findOne({
-      Symbol: symbol,
-    }).sort({ SNo: -1 });
-
-    if (!currentEntry) {
+    const stats = await fetchCurrencyStats(req, symbol, CryptoCurrencyModel);
+    if (!stats) {
       return res
         .status(status.NOT_FOUND)
         .json({ message: "No data found for this symbol" });
     }
+    return res.status(status.OK).json(stats);
+  } catch (error) {
+    return res.status(status.INTERNAL_SERVER_ERROR).json({ error });
+  }
+};
 
-    const currentPrice = currentEntry.Close;
-    const volume = currentEntry.Volume;
-    const marketCap = currentEntry.Marketcap;
+exports.fetchAllStats = async (req, res) => {
+  try {
+    const CryptoCurrencyModel = await CryptoCurrencies.getModel(
+      req.dbConnetion
+    );
+    const uniqueSymbols = await CryptoCurrencyModel.distinct("Symbol");
 
-    const currentSNo = currentEntry.SNo;
-    let SNo24hAgo = currentSNo - 1;
-    const SNo7dAgo = currentSNo - 7;
-    const SNo1mthAgo = currentSNo - 30;
+    let statsPromises = uniqueSymbols.map((symbol) =>
+      fetchCurrencyStats(req, symbol, CryptoCurrencyModel)
+    );
+    let stats = await Promise.all(statsPromises);
 
-    const entryStats24hAgo = await CryptoCurrencyModel.findOne({
-      Symbol: symbol,
-      SNo: SNo24hAgo,
-    });
-    const price24hAgo = entryStats24hAgo.Close;
-    const price24hChange = (currentPrice - price24hAgo) / price24hAgo;
-
-    const entryStats7dAgo = await CryptoCurrencyModel.findOne({
-      Symbol: symbol,
-      SNo: SNo7dAgo,
-    });
-    const price7dAgo = entryStats7dAgo.Close;
-    const price7dChange = (currentPrice - price7dAgo) / price7dAgo;
-
-    const entryStats1mthAgo = await CryptoCurrencyModel.findOne({
-      Symbol: symbol,
-      SNo: SNo1mthAgo,
-    });
-    const price1mthAgo = entryStats1mthAgo.Close;
-    const price1mthChange = (currentPrice - price1mthAgo) / price1mthAgo;
-
-    const CryptoInfoModel = await CryptoInfo.getModel(req.dbConnetion);
-    const targetCrypto = await CryptoInfoModel.findOne({ Symbol: symbol });
-    const image = targetCrypto ? targetCrypto.Image : config.DEFAULT_CRYPTO_IMG;
-
-    return res.status(status.OK).json({
-      name: currentEntry.Name,
-      symbol: currentEntry.Symbol,
-      date: currentEntry.Date,
-      currentPrice,
-      price24hChange,
-      price7dChange,
-      price1mthChange,
-      volume,
-      marketCap,
-      image,
-    });
+    return res.status(status.OK).json(stats);
   } catch (error) {
     return res.status(status.INTERNAL_SERVER_ERROR).json({ error });
   }
