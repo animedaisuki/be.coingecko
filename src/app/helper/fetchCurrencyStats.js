@@ -10,9 +10,9 @@ exports.fetchCurrencyStats = async (req, symbol, CryptoCurrencyModel) => {
     return null;
   }
 
-  const currentPrice = currentEntry.Close;
-  const volume = currentEntry.Volume;
-  const marketCap = currentEntry.Marketcap;
+  const currentPrice = currentEntry.Close.toFixed(2);
+  const volume = currentEntry.Volume.toFixed(0);
+  const marketCap = currentEntry.Marketcap.toFixed(0);
 
   const currentSNo = currentEntry.SNo;
   let SNo24hAgo = currentSNo - 1;
