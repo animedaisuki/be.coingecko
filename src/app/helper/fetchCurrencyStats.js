@@ -25,6 +25,7 @@ exports.fetchCurrencyStats = async (req, symbol, CryptoCurrencyModel) => {
   });
   const price24hAgo = entryStats24hAgo.Close;
   const price24hChange = (currentPrice - price24hAgo) / price24hAgo;
+  const price24hChangePercentage = (price24hChange * 100).toFixed(2);
 
   const entryStats7dAgo = await CryptoCurrencyModel.findOne({
     Symbol: symbol,
@@ -32,6 +33,7 @@ exports.fetchCurrencyStats = async (req, symbol, CryptoCurrencyModel) => {
   });
   const price7dAgo = entryStats7dAgo.Close;
   const price7dChange = (currentPrice - price7dAgo) / price7dAgo;
+  const price7dChangePercentage = (price7dChange * 100).toFixed(2);
 
   const entryStats1mthAgo = await CryptoCurrencyModel.findOne({
     Symbol: symbol,
@@ -39,6 +41,7 @@ exports.fetchCurrencyStats = async (req, symbol, CryptoCurrencyModel) => {
   });
   const price1mthAgo = entryStats1mthAgo.Close;
   const price1mthChange = (currentPrice - price1mthAgo) / price1mthAgo;
+  const price1mthChangePercentage = (price1mthChange * 100).toFixed(2);
 
   const CryptoInfoModel = await CryptoInfo.getModel(req.dbConnetion);
   const targetCrypto = await CryptoInfoModel.findOne({ Symbol: symbol });
@@ -49,9 +52,9 @@ exports.fetchCurrencyStats = async (req, symbol, CryptoCurrencyModel) => {
     symbol: symbol,
     date: currentEntry.Date,
     currentPrice,
-    price24hChange,
-    price7dChange,
-    price1mthChange,
+    price24hChangePercentage,
+    price7dChangePercentage,
+    price1mthChangePercentage,
     volume,
     marketCap,
     image,
