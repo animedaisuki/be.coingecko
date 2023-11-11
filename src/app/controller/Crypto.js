@@ -43,7 +43,7 @@ exports.fetchAllStats = async (req, res) => {
       fetchCurrencyStats(req, symbol, CryptoCurrencyModel)
     );
     let stats = await Promise.all(statsPromises);
-
+    stats.sort((a, b) => b.marketCap - a.marketCap);
     return res.status(status.OK).json(stats);
   } catch (error) {
     return res.status(status.INTERNAL_SERVER_ERROR).json({ error });
