@@ -36,5 +36,25 @@
 - Docker
 - AWS
 
+# 🛠️ Installation
+Clone the repository:
+```bash
+git clone https://github.com/animedaisuki/be.coingecko.git
+```
+
+Install dependencies:
+```bash
+be.coingecko
+npm install
+```
+
+Create a .env file and add your environment variables.
+
+Run the project:
+
+```bash
+npm run dev
+```
+
 ## 📜 License
 This project is released under the MIT License.
