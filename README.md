@@ -44,7 +44,7 @@ git clone https://github.com/animedaisuki/be.coingecko.git
 
 Install dependencies:
 ```bash
-be.coingecko
+cd be.coingecko
 npm install
 ```
 
